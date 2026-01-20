@@ -1,5 +1,6 @@
+import { useState, useEffect } from 'react';
 import { Navigate, Outlet, Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, CalendarCheck, Users, BarChart3, Settings, LogOut, Car } from 'lucide-react';
+import { LayoutDashboard, CalendarCheck, Users, BarChart3, Settings, LogOut, Car, MoreHorizontal } from 'lucide-react';
 import { useAuth } from '@/lib/authContext';
 import { Button } from '@/components/ui/button';
 import logo from '@/assets/trl-logo.png';
@@ -7,6 +8,12 @@ import logo from '@/assets/trl-logo.png';
 const AdminLayout = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Hide sidebar automatically on route change (mobile)
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   if (!isAuthenticated) {
     return <Navigate to="/trl" replace />;
@@ -33,14 +40,38 @@ const AdminLayout = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
+      {/* Mobile Top Bar */}
+      <header className="flex md:hidden justify-between items-center bg-sidebar p-4 border-b border-sidebar-border">
+        <img src={logo} alt="TRL Logo" className="h-8 w-auto" />
+        <Button
+          variant="ghost"
+          onClick={() => setSidebarOpen(true)}
+          className="p-2"
+        >
+          <MoreHorizontal className="h-5 w-5 text-sidebar-foreground" />
+        </Button>
+      </header>
+
       {/* Sidebar */}
-      <aside className="w-64 bg-sidebar text-sidebar-foreground flex flex-col fixed h-full">
-        <div className="p-6 border-b border-sidebar-border">
+      <aside
+        className={`fixed md:relative z-50 top-0 left-0 h-full w-64 bg-sidebar text-sidebar-foreground flex flex-col transform transition-transform duration-300
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+        `}
+      >
+        <div className="p-6 border-b border-sidebar-border flex justify-between items-center md:block">
           <img src={logo} alt="TRL Logo" className="h-12 w-auto" />
+          {/* Close button for mobile */}
+          <Button
+            variant="ghost"
+            className="md:hidden p-1"
+            onClick={() => setSidebarOpen(false)}
+          >
+            ✕
+          </Button>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -50,6 +81,7 @@ const AdminLayout = () => {
                   ? 'bg-sidebar-primary text-sidebar-primary-foreground'
                   : 'hover:bg-sidebar-accent text-sidebar-foreground/80 hover:text-sidebar-foreground'
               }`}
+              onClick={() => setSidebarOpen(false)}
             >
               <item.icon className="h-5 w-5" />
               {item.label}
@@ -62,9 +94,9 @@ const AdminLayout = () => {
             <div className="w-10 h-10 rounded-full bg-sidebar-accent flex items-center justify-center">
               {isCEO ? <Users className="h-5 w-5" /> : <Car className="h-5 w-5" />}
             </div>
-            <div>
-              <div className="font-medium text-sm">{user?.name}</div>
-              <div className="text-xs text-sidebar-foreground/60 capitalize">{user?.role}</div>
+            <div className="truncate">
+              <div className="font-medium text-sm truncate">{user?.name}</div>
+              <div className="text-xs text-sidebar-foreground/60 capitalize truncate">{user?.role}</div>
             </div>
           </div>
           <Button
@@ -82,7 +114,7 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8">
+      <main className="flex-1 md:ml-64 p-4 md:p-8">
         <Outlet />
       </main>
     </div>
