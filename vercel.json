@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/trl",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/trl/(.*)",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

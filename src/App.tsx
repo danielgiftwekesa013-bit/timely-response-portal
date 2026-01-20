@@ -33,16 +33,19 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {/* Public Routes */}
+              {/* ================= PUBLIC ROUTES ================= */}
               <Route element={<PublicLayout />}>
                 <Route path="/" element={<Index />} />
                 <Route path="/book" element={<BookRide />} />
                 <Route path="/track" element={<TrackRide />} />
               </Route>
 
-              {/* Admin Routes */}
+              {/* ================= ADMIN ROUTES ================= */}
+              {/* Direct login page */}
               <Route path="/trl" element={<AdminLogin />} />
-              <Route path="/trl" element={<AdminLayout />}>
+
+              {/* Admin layout for authenticated pages */}
+              <Route path="/trl/*" element={<AdminLayout />}>
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="pickups" element={<ScheduledPickups />} />
                 <Route path="my-pickups" element={<ScheduledPickups />} />
@@ -51,7 +54,7 @@ const App = () => (
                 <Route path="settings" element={<Settings />} />
               </Route>
 
-              {/* Catch-all */}
+              {/* ================= 404 ================= */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
